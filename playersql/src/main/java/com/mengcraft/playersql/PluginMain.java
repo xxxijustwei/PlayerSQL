@@ -60,20 +60,16 @@ public class PluginMain extends JavaPlugin implements Executor {
         try {
             getServer().getPluginManager().registerEvents(new ExtendEventExecutor(manager), this);
         } catch (Exception ignore) {
-        }// There is some event since 1.8.
+        }
 
-//        if (getConfig().getBoolean("plugin.use-protocol-locker", false) && getPluginManager().isPluginEnabled("ProtocolLib")) {
-//            ProtocolLibrary.getProtocolManager().addPacketListener(ProtocolBasedLocker.b(this));
-//        } else {
         getPluginManager().registerEvents(new EventLocker(), this);
-//        }
 
         getServer().getMessenger().registerOutgoingPluginChannel(this, Constants.PLUGIN_CHANNEL);
         getServer().getMessenger().registerIncomingPluginChannel(this, Constants.PLUGIN_CHANNEL, executor);
 
-//        getCommand("playersql").setExecutor(new Commands());
+        /*getCommand("playersql").setExecutor(new Commands());*/
 
-        getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "PlayerSQL enabled! Donate me plz. https://www.paypal.me/2732000916/5");
+        getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "PlayerSQL enabled!");
     }
 
     @Override

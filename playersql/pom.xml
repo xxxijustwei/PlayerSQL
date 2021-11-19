@@ -32,7 +32,7 @@
                     <artifactSet>
                         <includes>
                             <include>org.lz4:*</include>
-                            <include>com.mengcraft:*</include>
+                            <include>net.sakuragame.eternal:PlayerSQL-Bungee</include>
                         </includes>
                     </artifactSet>
                     <relocations>
