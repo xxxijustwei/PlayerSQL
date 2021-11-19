@@ -1,6 +1,7 @@
 package com.mengcraft.playersql;
 
 import com.comphenix.protocol.utility.StreamSerializer;
+import com.google.gson.stream.MalformedJsonException;
 import ink.ptms.zaphkiel.ZaphkielAPI;
 import ink.ptms.zaphkiel.api.ItemStream;
 import lombok.SneakyThrows;
@@ -21,10 +22,12 @@ public class DataSerializer {
 
     @SneakyThrows
     public static ItemStack deserialize(Player player, String input) {
-        ItemStream itemStream = ZaphkielAPI.INSTANCE.deserialize(input);
-        if (itemStream.isVanilla()) {
+        try {
+            ItemStream itemStream = ZaphkielAPI.INSTANCE.deserialize(input);
+            return itemStream.rebuildToItemStack(player);
+        }
+        catch (Exception e) {
             return StreamSerializer.getDefault().deserializeItemStack(input);
         }
-        return itemStream.rebuildToItemStack(player);
     }
 }
