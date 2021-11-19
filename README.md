@@ -1,7 +1,7 @@
 PlayerSQL
 =========
 
-# Notice
+## Notice
 - version: 1.12.2 **(only)**
 - serializer: [protocol](https://github.com/aadnk/ProtocolLib) & [zaphkiel](https://github.com/Bkm016/Zaphkiel)
 
