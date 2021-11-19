@@ -1,8 +1,8 @@
 main: com.mengcraft.playersql.PluginMain
 name: PlayerSQL
 version: ${project.version}
-website: http://www.spigotmc.org/resources/playersql.552/
 author: caoli5288@gmail.com
-depend: [SimpleORM, ProtocolLib]
-libraries:
-  - org.lz4:lz4-java:1.8.0
+depend:
+  - DataManager
+  - ProtocolLib
+  - Zaphkiel

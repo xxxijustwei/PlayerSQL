@@ -1,5 +1,4 @@
-main: com.github.caoli5288.playersql.bungee.PlayerSqlBungee
+main: com.mengcraft.playersql.bungee.PlayerSqlBungee
 name: PlayerSqlBungee
 version: ${project.version}
-website: http://www.spigotmc.org/resources/playersql.552/
 author: caoli5288@gmail.com

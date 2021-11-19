@@ -8,10 +8,10 @@
         <version>2.13-SNAPSHOT</version>
     </parent>
 
-    <artifactId>playersql</artifactId>
+    <artifactId>PlayerSQL</artifactId>
 
     <build>
-        <finalName>${artifactId}</finalName>
+        <finalName>${project.name}-${project.parent.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
