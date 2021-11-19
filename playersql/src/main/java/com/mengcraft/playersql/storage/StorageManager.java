@@ -47,7 +47,7 @@ public class StorageManager {
                 String inventory = result.getString("inventory");
                 String armor = result.getString("armor");
                 boolean locked = result.getBoolean("locked");
-                Timestamp timestamp = result.getTimestamp("timestamp");
+                Timestamp timestamp = result.getTimestamp("lastUpdate");
 
                 return new PlayerData(uid, hand, inventory, armor, locked, timestamp);
             }
