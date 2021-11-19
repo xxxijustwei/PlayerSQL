@@ -1,13 +1,13 @@
 package com.mengcraft.playersql.event;
 
 import com.mengcraft.playersql.PlayerData;
-import lombok.Data;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
-@Data
+@Getter
 public class PlayerDataStoreEvent extends PlayerEvent {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();

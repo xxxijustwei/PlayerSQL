@@ -1,6 +1,6 @@
 package com.mengcraft.playersql.event;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerEvent;
 /**
  * Called when a player's data processed even if any exception thrown.
  */
-@Data
+@Getter
 public class PlayerDataProcessedEvent extends PlayerEvent {
 
     public static final HandlerList HANDLER_LIST = new HandlerList();

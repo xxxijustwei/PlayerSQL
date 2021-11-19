@@ -9,11 +9,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>internal</module>
         <module>bungee</module>
-        <module>v1_8_3</module>
-        <module>v1_12</module>
-        <module>v1_13_2</module>
         <module>playersql</module>
     </modules>
 
@@ -34,6 +30,14 @@
         <repository>
             <id>repo</id>
             <url>https://repo.i7mc.com/maven2</url>
+        </repository>
+        <repository>
+            <id>ycraft</id>
+            <url>https://maven.ycraft.cn/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>ptms</id>
+            <url>https://repo2s.ptms.ink/repository/maven-releases</url>
         </repository>
         <repository>
             <id>jitpack</id>

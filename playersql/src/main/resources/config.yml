@@ -1,19 +1,10 @@
 plugin:
   debug: false
   delay: 10
-  max-db-connection: 8
   omit-player-death: false
   use-protocollib-default: false
   disable-filter-network: false
   apply-null-userdata: false
-
-sync:
-  health: true
-  food: true
-  exp: true
-  inventory: true
-  chest: true
-  potion: true
 
 kick-load-failed: true
 

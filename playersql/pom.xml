@@ -27,6 +27,18 @@
                 </executions>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <artifactSet>
+                        <includes>
+                            <include>org.lz4:*</include>
+                            <include>com.mengcraft:*</include>
+                        </includes>
+                    </artifactSet>
+                    <relocations>
+                        <relocation>
+                            <pattern>com.github.caoli5288.playersql.bungee</pattern>
+                            <shadedPattern>com.mengcraft.playersql.bungee</shadedPattern>
+                        </relocation>
+                    </relocations>
                 </configuration>
             </plugin>
         </plugins>
@@ -45,51 +57,48 @@
             <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-api</artifactId>
-            <version>1.12-SNAPSHOT</version>
-            <scope>provided</scope>
+            <artifactId>Cord</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/../.lib/FlameCord.jar</systemPath>
         </dependency>
+
         <dependency>
-            <groupId>com.github.caoli5288</groupId>
-            <artifactId>simpleorm</artifactId>
-            <version>c5c3feef78</version>
-            <scope>provided</scope>
+            <groupId>net.sakuragame</groupId>
+            <artifactId>DataManager-Bukkit-API</artifactId>
+            <version>1.2.0-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>ink.ptms</groupId>
+            <artifactId>Zaphkiel</artifactId>
+            <version>1.7.2</version>
+        </dependency>
+
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>4.4.0</version>
+            <version>4.7.0</version>
             <scope>provided</scope>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.lz4/lz4-java -->
         <dependency>
             <groupId>org.lz4</groupId>
             <artifactId>lz4-java</artifactId>
             <version>1.8.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.47.Final</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.mengcraft</groupId>
-            <artifactId>playersql-internal</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mengcraft</groupId>
-            <artifactId>playersql-v1_8_3</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mengcraft</groupId>
-            <artifactId>playersql-v1_12</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mengcraft</groupId>
-            <artifactId>playersql-v1_13_2</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>com.mengcraft</groupId>
             <artifactId>playersql-bungee</artifactId>

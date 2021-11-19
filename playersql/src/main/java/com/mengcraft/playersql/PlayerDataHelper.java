@@ -15,16 +15,9 @@ public class PlayerDataHelper {
     @SneakyThrows
     public static byte[] encode(PlayerData dat) {
         ByteArrayDataOutput output = ByteStreams.newDataOutput();
-        output.writeLong(dat.getUuid().getMostSignificantBits());
-        output.writeLong(dat.getUuid().getLeastSignificantBits());
-        output.writeDouble(dat.getHealth());
-        output.writeInt(dat.getFood());
+        output.writeInt(dat.getUid());
         output.writeInt(dat.getHand());
-        output.writeInt(dat.getExp());
         write(output, dat.getInventory());
-        write(output, dat.getArmor());
-        write(output, dat.getChest());
-        write(output, dat.getEffect());
         byte[] uncompressed = output.toByteArray();
         output = ByteStreams.newDataOutput();
         VarInt.writeUnsignedVarInt(output, uncompressed.length);
@@ -47,15 +40,9 @@ public class PlayerDataHelper {
         byte[] decompressed = LZ4.decompress(compressed, uncompressedLen);
         input = ByteStreams.newDataInput(decompressed);
         PlayerData dat = new PlayerData();// PARSER PLAYER DATA
-        dat.setUuid(new UUID(input.readLong(), input.readLong()));
-        dat.setHealth(input.readDouble());
-        dat.setFood(input.readInt());
+        dat.setUid(input.readInt());
         dat.setHand(input.readInt());
-        dat.setExp(input.readInt());
         dat.setInventory(readString(input));
-        dat.setArmor(readString(input));
-        dat.setChest(readString(input));
-        dat.setEffect(readString(input));
         return dat;
     }
 

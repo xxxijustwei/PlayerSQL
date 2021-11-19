@@ -3,12 +3,12 @@ package com.mengcraft.playersql;
 import com.mengcraft.playersql.event.PlayerDataFetchedEvent;
 import com.mengcraft.playersql.event.PlayerDataProcessedEvent;
 import com.mengcraft.playersql.event.PlayerDataStoreEvent;
-import com.mengcraft.playersql.internal.GuidResolveService;
-import com.mengcraft.playersql.lib.SetExpFix;
+import com.mengcraft.playersql.storage.StorageManager;
 import com.mengcraft.playersql.task.DailySaveTask;
-import com.mengcraft.simpleorm.EbeanHandler;
 import lombok.SneakyThrows;
 import lombok.val;
+import net.sakuragame.serversystems.manage.client.api.ClientManagerAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -18,15 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static com.mengcraft.playersql.PluginMain.nil;
 
@@ -43,7 +35,7 @@ public enum UserManager {
     private final Set<UUID> locked = new HashSet<>();
 
     private PluginMain main;
-    private EbeanHandler db;
+    private StorageManager storageManager;
 
     public void addFetched(Player player, PlayerData user) {
         main.run(() -> pend(player, user));
@@ -53,11 +45,7 @@ public enum UserManager {
      * @return The user, or <code>null</code> if not exists.
      */
     public PlayerData fetchUser(UUID uuid) {
-        return db.find(PlayerData.class, uuid);
-    }
-
-    public List<PlayerData> fetchName(String name) {
-        return db.getServer().find(PlayerData.class).where("name = :name").setParameter("name", name).findList();
+        return storageManager.find(uuid);
     }
 
     public void saveUser(Player p, boolean lock) {
@@ -66,18 +54,15 @@ public enum UserManager {
 
     public void saveUser(PlayerData user, boolean lock) {
         user.setLocked(lock);
-        db.update(user);
+        storageManager.update(user);
         if (Config.DEBUG) {
-            main.log("Save user data " + user.getUuid() + " done!");
+            String name = ClientManagerAPI.getUserName(user.getUid());
+            main.log("Save user data " + name + " done!");
         }
     }
 
     public void updateDataLock(UUID who, boolean lock) {
-        val update = db.getServer().createUpdate(PlayerData.class, "update " + PlayerData.TABLE_NAME +
-                " set locked = :locked where uuid = :uuid");
-        update.set("locked", lock);
-        update.set("uuid", who.toString());
-        int result = update.execute();
+        int result = storageManager.updateDateLock(who, lock);
         if (Config.DEBUG) {
             if (result == 1) {
                 main.log("Update " + who + " lock to " + lock + " okay");
@@ -114,32 +99,17 @@ public enum UserManager {
     }
 
     public PlayerData getUserData(Player p, boolean closeInventory) {
+        int uid = ClientManagerAPI.getUserID(p.getUniqueId());
         PlayerData user = new PlayerData();
-        user.setUuid(GuidResolveService.getService().getGuid(p));
-        user.setName(p.getName());
-        if (Config.SYN_HEALTH) {
-            user.setHealth(p.getHealth());
+        user.setUid(uid);
+
+        if (closeInventory) {
+            closeInventory(p);
         }
-        if (Config.SYN_FOOD) {
-            user.setFood(p.getFoodLevel());
-        }
-        if (Config.SYN_INVENTORY) {
-            if (closeInventory) {
-                closeInventory(p);
-            }
-            user.setInventory(toString(p.getInventory().getContents()));
-            user.setArmor(toString(p.getInventory().getArmorContents()));
-            user.setHand(p.getInventory().getHeldItemSlot());
-        }
-        if (Config.SYN_CHEST) {
-            user.setChest(toString(p.getEnderChest().getContents()));
-        }
-        if (Config.SYN_EFFECT) {
-            user.setEffect(toString(p.getActivePotionEffects()));
-        }
-        if (Config.SYN_EXP) {
-            user.setExp(SetExpFix.getTotalExperience(p));
-        }
+        user.setInventory(toString(p.getInventory().getContents()));
+        user.setArmor(toString(p.getInventory().getArmorContents()));
+        user.setHand(p.getInventory().getHeldItemSlot());
+
         PlayerDataStoreEvent.call(p, user);
         return user;
     }
@@ -184,7 +154,7 @@ public enum UserManager {
 
     public void pend(Player who, PlayerData data) {
         if (who == null || !who.isOnline()) {
-            main.log(new IllegalStateException("Player " + data.getUuid() + " not found"));
+            main.log(new IllegalStateException("Player " + data.getUid() + " not found"));
             return;
         }
 
@@ -215,45 +185,24 @@ public enum UserManager {
     }
 
     private void syncUserdata(Player who, PlayerData data) {
-        if (Config.SYN_INVENTORY) {
-            val ctx = toStack(data.getInventory());
-            who.closeInventory();
-            val inv = who.getInventory();
-            if (ctx.length > inv.getSize()) {// Fixed #36
-                int size = inv.getSize();
-                inv.setContents(Arrays.copyOf(ctx, size));
-                val out = inv.addItem(Arrays.copyOfRange(ctx, size, ctx.length));
-                if (!out.isEmpty()) {
-                    val location = who.getLocation();
-                    out.forEach((o, item) -> who.getWorld().dropItem(location, item));
-                }
-            } else {
-                inv.setContents(ctx);
+        val ctx = toStack(who, data.getInventory());
+        who.closeInventory();
+        val inv = who.getInventory();
+        if (ctx.length > inv.getSize()) {// Fixed #36
+            int size = inv.getSize();
+            inv.setContents(Arrays.copyOf(ctx, size));
+            val out = inv.addItem(Arrays.copyOfRange(ctx, size, ctx.length));
+            if (!out.isEmpty()) {
+                val location = who.getLocation();
+                out.forEach((o, item) -> who.getWorld().dropItem(location, item));
             }
-            inv.setArmorContents(toStack(data.getArmor()));
-            inv.setHeldItemSlot(data.getHand());
-            who.updateInventory();// Force update needed
+        } else {
+            inv.setContents(ctx);
         }
-        if (Config.SYN_HEALTH && who.getMaxHealth() >= data.getHealth()) {
-            who.setHealth(data.getHealth() <= 0 && Config.OMIT_PLAYER_DEATH ? who.getMaxHealth() : data.getHealth());
-        }
-        if (Config.SYN_EXP) {
-            SetExpFix.setTotalExperience(who, data.getExp());
-        }
-        if (Config.SYN_FOOD) {
-            who.setFoodLevel(data.getFood());
-        }
-        if (Config.SYN_EFFECT) {
-            for (val eff : who.getActivePotionEffects()) {
-                who.removePotionEffect(eff.getType());
-            }
-            for (val eff : toEffect(data.getEffect())) {
-                who.addPotionEffect(eff, true);
-            }
-        }
-        if (Config.SYN_CHEST) {
-            who.getEnderChest().setContents(toStack(data.getChest()));
-        }
+        inv.setArmorContents(toStack(who, data.getArmor()));
+        inv.setHeldItemSlot(data.getHand());
+        who.updateInventory();// Force update needed
+
         createTask(who);
         unlockUser(who);
     }
@@ -280,14 +229,14 @@ public enum UserManager {
 
     @SuppressWarnings("unchecked")
     @SneakyThrows
-    public ItemStack[] toStack(String input) {
+    public ItemStack[] toStack(Player player, String input) {
         List<String> list = parseArray(input);
         List<ItemStack> output = new ArrayList<>(list.size());
         for (String line : list) {
             if (nil(line) || line.isEmpty()) {
                 output.add(AIR);
             } else {
-                output.add(DataSerializer.deserialize(line));
+                output.add(DataSerializer.deserialize(player, line));
             }
         }
         return output.toArray(new ItemStack[list.size()]);
@@ -352,14 +301,21 @@ public enum UserManager {
         return main;
     }
 
-    public void setDb(EbeanHandler db) {
-        this.db = db;
+    public void setDb(StorageManager db) {
+        this.storageManager = db;
     }
 
     public void newUser(UUID uuid) {
         PlayerData user = new PlayerData();
-        user.setUuid(uuid);
+        user.setUid(ClientManagerAPI.getUserID(uuid));
         user.setLocked(true);
-        db.save(user);
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) {
+            user.setHand(0);
+        }
+        else {
+            user.setHand(player.getInventory().getHeldItemSlot());
+        }
+        storageManager.save(user);
     }
 }

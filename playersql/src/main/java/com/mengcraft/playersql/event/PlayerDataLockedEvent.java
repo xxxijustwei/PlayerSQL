@@ -1,13 +1,15 @@
 package com.mengcraft.playersql.event;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import java.sql.Timestamp;
 
-@Data
+@Getter
+@Setter
 public class PlayerDataLockedEvent extends Event {
 
     public static final HandlerList HANDLER_LIST = new HandlerList();

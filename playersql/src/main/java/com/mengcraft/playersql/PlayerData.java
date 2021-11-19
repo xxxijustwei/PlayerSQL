@@ -1,85 +1,37 @@
 package com.mengcraft.playersql;
 
-import com.avaje.ebean.annotation.UpdatedTimestamp;
+import lombok.AllArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import java.sql.Timestamp;
-import java.util.UUID;
-
-import static com.mengcraft.playersql.PlayerData.TABLE_NAME;
 
 /**
  * Created on 16-1-2.
  */
-@Entity
-@Table(name = TABLE_NAME)
+@AllArgsConstructor
 public class PlayerData {
 
-    public static final String TABLE_NAME = "PLAYERSQL";
-
-    @Id
-    private UUID uuid;
-
-    private String name;
-
-    private double health;
-
-    private int food;
+    private int uid;
 
     private int hand;
 
-    private int exp;
-
-    @Column(columnDefinition = "LONGTEXT")
     private String inventory;
 
-    @Column(columnDefinition = "TEXT")
     private String armor;
-
-    @Column(columnDefinition = "LONGTEXT")
-    private String chest;
-
-    @Column(columnDefinition = "TEXT")
-    private String effect;
 
     private boolean locked;
 
-    @UpdatedTimestamp
     private Timestamp lastUpdate;
 
-    public UUID getUuid() {
-        return uuid;
+    public PlayerData() {
+        this.lastUpdate = new Timestamp(System.currentTimeMillis());
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public int getUid() {
+        return uid;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public double getHealth() {
-        return health;
-    }
-
-    public void setHealth(double health) {
-        this.health = health;
-    }
-
-    public int getFood() {
-        return food;
-    }
-
-    public void setFood(int food) {
-        this.food = food;
+    public void setUid(int uid) {
+        this.uid = uid;
     }
 
     public int getHand() {
@@ -88,14 +40,6 @@ public class PlayerData {
 
     public void setHand(int hand) {
         this.hand = hand;
-    }
-
-    public int getExp() {
-        return exp;
-    }
-
-    public void setExp(int exp) {
-        this.exp = exp;
     }
 
     public String getInventory() {
@@ -112,22 +56,6 @@ public class PlayerData {
 
     public void setArmor(String armor) {
         this.armor = armor;
-    }
-
-    public String getChest() {
-        return chest;
-    }
-
-    public void setChest(String chest) {
-        this.chest = chest;
-    }
-
-    public String getEffect() {
-        return effect;
-    }
-
-    public void setEffect(String effect) {
-        this.effect = effect;
     }
 
     public boolean isLocked() {
