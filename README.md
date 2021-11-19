@@ -1,17 +1,14 @@
 PlayerSQL
 =========
 
-[![](https://jitci.com/gh/caoli5288/PlayerSQL/svg)](https://jitci.com/gh/caoli5288/PlayerSQL)
+# Notice
+- version: 1.12.2(only)
+- serializer: [protocol](https://github.com/aadnk/ProtocolLib) & zaphkiel(https://github.com/Bkm016/Zaphkiel)
 
 允许你通过这个插件在不同的Minecraft服务器之间同步玩家数据。[投食链接](https://www.paypal.me/2732000916/5)
 
 - 物品栏
 - 装备栏
-- 经验值
-- 生命值
-- 饥饿值
-- 末影箱
-- 药效果
 
 事件管理器
 --------
