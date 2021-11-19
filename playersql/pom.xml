@@ -3,12 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
+        <groupId>net.sakuragame.eternal</groupId>
         <artifactId>playersql-parent</artifactId>
-        <groupId>com.mengcraft</groupId>
         <version>2.13-SNAPSHOT</version>
     </parent>
 
+
     <artifactId>PlayerSQL</artifactId>
+    <packaging>jar</packaging>
 
     <build>
         <finalName>${project.name}-${project.parent.version}</finalName>
@@ -100,8 +102,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.mengcraft</groupId>
-            <artifactId>playersql-bungee</artifactId>
+            <groupId>net.sakuragame.eternal</groupId>
+            <artifactId>PlayerSQL-Bungee</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
