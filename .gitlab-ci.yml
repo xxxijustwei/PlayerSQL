@@ -27,12 +27,11 @@ deploy:
     - mvn clean deploy -DskipTests
     - mkdir -p $TARGET_DIR
     - rm -rf $TARGET_DIR/*
-    - cp -vrf ./*/target/*.jar $TARGET_DIR/
+    - cp -vrf ./playersql/target/*.jar $TARGET_DIR/
     - rm -vrf $TARGET_DIR/original*
-    - rm -vrf $TARGET_DIR/*-shaded.jar
   only:
     - master
     - main
   artifacts:
     paths:
-      - ./*/target/*.jar
+      - ./playersql/target/*.jar
