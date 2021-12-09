@@ -2,7 +2,6 @@ plugin:
   debug: false
   delay: 10
   omit-player-death: false
-  use-protocollib-default: false
   disable-filter-network: false
   apply-null-userdata: false
 

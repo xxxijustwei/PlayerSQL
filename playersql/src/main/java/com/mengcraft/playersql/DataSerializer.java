@@ -1,10 +1,9 @@
 package com.mengcraft.playersql;
 
-import com.comphenix.protocol.utility.StreamSerializer;
-import com.google.gson.stream.MalformedJsonException;
 import ink.ptms.zaphkiel.ZaphkielAPI;
 import ink.ptms.zaphkiel.api.ItemStream;
 import lombok.SneakyThrows;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,9 +12,7 @@ public class DataSerializer {
     @SneakyThrows
     public static String serialize(ItemStack input) {
         ItemStream itemStream = ZaphkielAPI.INSTANCE.read(input);
-        if (itemStream.isVanilla()) {
-            return StreamSerializer.getDefault().serializeItemStack(input);
-        }
+        if (itemStream.isVanilla()) return "";
 
         return ZaphkielAPI.INSTANCE.serialize(input).toString();
     }
@@ -27,7 +24,7 @@ public class DataSerializer {
             return itemStream.rebuildToItemStack(player);
         }
         catch (Exception e) {
-            return StreamSerializer.getDefault().deserializeItemStack(input);
+            return new ItemStack(Material.AIR);
         }
     }
 }

@@ -3,7 +3,7 @@ PlayerSQL
 
 ## Notice
 - version: 1.12.2 **(only)**
-- serializer: [protocol](https://github.com/aadnk/ProtocolLib) & [zaphkiel](https://github.com/Bkm016/Zaphkiel)
+- serializer: [zaphkiel](https://github.com/Bkm016/Zaphkiel)
 
 允许你通过这个插件在不同的Minecraft服务器之间同步玩家数据。[投食链接](https://www.paypal.me/2732000916/5)
 
