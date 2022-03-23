@@ -5,6 +5,7 @@ import com.mengcraft.playersql.PlayerData;
 import com.mengcraft.playersql.PluginMain;
 import com.mengcraft.playersql.UserManager;
 import com.mengcraft.playersql.event.PlayerDataLockedEvent;
+import com.mengcraft.playersql.event.PlayerDataProcessedEvent;
 import com.mengcraft.playersql.internal.GuidResolveService;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -57,8 +58,10 @@ public class FetchUserTask extends BukkitRunnable {
                 manager.createTask(player);
             });
 
+            PlayerDataProcessedEvent.call(player, null);
+
             if (Config.DEBUG) {
-                main.log("New user data for" + player.getName() + '.');
+                main.log("New user data for " + player.getName() + '.');
             }
         } else if (user.isLocked() && this.retry++ < 8) {
             if (Config.DEBUG) {
