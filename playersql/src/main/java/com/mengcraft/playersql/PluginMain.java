@@ -58,7 +58,7 @@ public class PluginMain extends JavaPlugin implements Executor {
 
         getServer().getPluginManager().registerEvents(executor, this);
         try {
-            getServer().getPluginManager().registerEvents(new ExtendEventExecutor(manager), this);
+            getServer().getPluginManager().registerEvents(new ExtendEventExecutor(), this);
         } catch (Exception ignore) {
         }
 
