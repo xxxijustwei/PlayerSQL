@@ -1,6 +1,6 @@
 plugin:
   debug: false
-  delay: 10
+  delay: 15
   omit-player-death: false
   disable-filter-network: false
   apply-null-userdata: false
@@ -9,7 +9,3 @@ kick-load-failed: true
 
 message:
   kick_load: Your game data loading error, please contact the operator
-
-bungee:
-  enable: false
-  channel_group: 'default'
