@@ -1,6 +1,6 @@
 plugin:
   debug: false
-  delay: 15
+  delay: 10
   omit-player-death: false
   disable-filter-network: false
   apply-null-userdata: false

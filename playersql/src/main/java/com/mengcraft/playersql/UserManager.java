@@ -197,7 +197,7 @@ public enum UserManager {
             this.main.log("Scheduling daily save task for user " + player.getName() + '.');
         }
         val task = new DailySaveTask(player);
-        task.runTaskTimer(main, 6000, 6000);
+        task.runTaskTimer(main, 18000, 18000);
         val old = scheduled.put(player.getUniqueId(), task);
         if (!nil(old)) {
             old.cancel();
