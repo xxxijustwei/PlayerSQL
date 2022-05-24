@@ -41,7 +41,7 @@ public class FetchUserTask extends BukkitRunnable {
             return;
         }
 
-        PlayerData user = manager.fetchUser(id);
+        PlayerData user = manager.fetchUser(player);
         if (nil(user)) {
             cancel();
 

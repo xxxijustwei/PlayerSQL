@@ -5,18 +5,11 @@ import com.mengcraft.playersql.event.PlayerDataProcessedEvent;
 import com.mengcraft.playersql.event.PlayerDataStoreEvent;
 import com.mengcraft.playersql.storage.StorageManager;
 import com.mengcraft.playersql.task.DailySaveTask;
-import lombok.SneakyThrows;
 import lombok.val;
 import net.sakuragame.serversystems.manage.client.api.ClientManagerAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
 
 import java.util.*;
 
@@ -28,8 +21,6 @@ import static com.mengcraft.playersql.PluginMain.nil;
 public enum UserManager {
 
     INSTANCE;
-
-    public static final ItemStack AIR = new ItemStack(Material.AIR);
 
     private final Map<UUID, BukkitRunnable> scheduled = new HashMap<>();
     private final Set<UUID> locked = new HashSet<>();
@@ -44,8 +35,8 @@ public enum UserManager {
     /**
      * @return The user, or <code>null</code> if not exists.
      */
-    public PlayerData fetchUser(UUID uuid) {
-        return storageManager.find(uuid);
+    public PlayerData fetchUser(Player player) {
+        return storageManager.find(player);
     }
 
     public void saveUser(Player p, boolean lock) {
@@ -100,18 +91,17 @@ public enum UserManager {
 
     public PlayerData getUserData(Player p, boolean closeInventory) {
         int uid = ClientManagerAPI.getUserID(p.getUniqueId());
-        PlayerData user = new PlayerData();
-        user.setUid(uid);
+        PlayerData account = new PlayerData();
+        account.setUid(uid);
 
         if (closeInventory) {
             closeInventory(p);
         }
-        user.setInventory(toString(p.getInventory().getContents()));
-        user.setArmor(toString(p.getInventory().getArmorContents()));
-        user.setHand(p.getInventory().getHeldItemSlot());
+        account.setSlots(p);
+        account.setHand(p.getInventory().getHeldItemSlot());
 
-        PlayerDataStoreEvent.call(p, user);
-        return user;
+        PlayerDataStoreEvent.call(p, account);
+        return account;
     }
 
     public static boolean isLocked(UUID uuid) {
@@ -185,88 +175,12 @@ public enum UserManager {
     }
 
     private void syncUserdata(Player who, PlayerData data) {
-        val ctx = toStack(who, data.getInventory());
-        who.closeInventory();
-        val inv = who.getInventory();
-        if (ctx.length > inv.getSize()) {// Fixed #36
-            int size = inv.getSize();
-            inv.setContents(Arrays.copyOf(ctx, size));
-            val out = inv.addItem(Arrays.copyOfRange(ctx, size, ctx.length));
-            if (!out.isEmpty()) {
-                val location = who.getLocation();
-                out.forEach((o, item) -> who.getWorld().dropItem(location, item));
-            }
-        } else {
-            inv.setContents(ctx);
-        }
-        inv.setArmorContents(toStack(who, data.getArmor()));
-        inv.setHeldItemSlot(data.getHand());
+        data.getSlots().forEach((index, item) -> who.getInventory().setItem(index, item));
+        who.getInventory().setHeldItemSlot(data.getHand());
         who.updateInventory();// Force update needed
 
         createTask(who);
         unlockUser(who);
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<PotionEffect> toEffect(String input) {
-        List<List> parsed = parseArray(input);
-        List<PotionEffect> output = new ArrayList<>(parsed.size());
-        for (List<Number> entry : parsed) {
-            output.add(new PotionEffect(PotionEffectType.getById(entry.get(0).intValue()), entry.get(1).intValue(), entry.get(2).intValue()));
-        }
-        return output;
-    }
-
-    public static JSONArray parseArray(String in) {
-        if (!nil(in)) {
-            Object parsed = JSONValue.parse(in);
-            if (parsed instanceof JSONArray) {
-                return ((JSONArray) parsed);
-            }
-        }
-        return new JSONArray();
-    }
-
-    @SuppressWarnings("unchecked")
-    @SneakyThrows
-    public ItemStack[] toStack(Player player, String input) {
-        List<String> list = parseArray(input);
-        List<ItemStack> output = new ArrayList<>(list.size());
-        for (String line : list) {
-            if (nil(line) || line.isEmpty()) {
-                output.add(AIR);
-            } else {
-                output.add(DataSerializer.deserialize(player, line));
-            }
-        }
-        return output.toArray(new ItemStack[list.size()]);
-    }
-
-    @SuppressWarnings("unchecked")
-    public String toString(ItemStack[] stacks) {
-        JSONArray array = new JSONArray();
-        for (ItemStack stack : stacks)
-            if (stack == null || stack.getAmount() == 0) {
-                array.add("");
-            } else try {
-                array.add(DataSerializer.serialize(stack));
-            } catch (Exception e) {
-                main.log(e);
-            }
-        return array.toString();
-    }
-
-    @SuppressWarnings("unchecked")
-    private String toString(Collection<PotionEffect> effects) {
-        val out = new JSONArray();
-        for (PotionEffect effect : effects) {
-            val sub = new JSONArray();
-            sub.add(effect.getType().getId());
-            sub.add(effect.getDuration());
-            sub.add(effect.getAmplifier());
-            out.add(sub);
-        }
-        return out.toString();
     }
 
     public void cancelTimerSaver(UUID uuid) {

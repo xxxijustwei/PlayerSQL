@@ -1,41 +1,28 @@
 package com.mengcraft.playersql;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import ink.ptms.zaphkiel.ZaphkielAPI;
 import ink.ptms.zaphkiel.api.ItemStream;
 import lombok.SneakyThrows;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class DataSerializer {
 
-    private final static Gson gson = new Gson();
+    private final static JsonParser parser = new JsonParser();
 
     @SneakyThrows
-    public static String serialize(ItemStack input) {
-        ItemStream itemStream = ZaphkielAPI.INSTANCE.read(input);
-        if (itemStream.isVanilla()) return "";
+    public static ItemStack deserialize(Player player, String id, int amount, String data, String unique) {
+        JsonObject object = new JsonObject();
+        object.addProperty("id", id);
+        if (data != null && !data.isEmpty()) object.add("data", parser.parse(data));
+        if (unique != null && !unique.isEmpty()) object.add("unique", parser.parse(unique));
 
-        JsonObject result = ZaphkielAPI.INSTANCE.serialize(input);
-        result.addProperty("amount", input.getAmount());
+        ItemStream itemStream = ZaphkielAPI.INSTANCE.deserialize(object);
+        ItemStack result = itemStream.rebuildToItemStack(player);
+        result.setAmount(amount);
 
-        return result.toString();
-    }
-
-    @SneakyThrows
-    public static ItemStack deserialize(Player player, String input) {
-        try {
-            JsonObject target = gson.fromJson(input, JsonObject.class);
-            ItemStream itemStream = ZaphkielAPI.INSTANCE.deserialize(target);
-            ItemStack itemStack = itemStream.rebuildToItemStack(player);
-            itemStack.setAmount(target.get("amount").getAsInt());
-
-            return itemStack;
-        }
-        catch (Exception e) {
-            return new ItemStack(Material.AIR);
-        }
+        return result;
     }
 }

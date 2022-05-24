@@ -47,7 +47,7 @@ public class PluginMain extends JavaPlugin implements Executor {
 
         messenger = new Messenger(this);
 
-        storageManager = new StorageManager(this);
+        storageManager = new StorageManager();
         storageManager.init();
 
         UserManager manager = UserManager.INSTANCE;
@@ -57,15 +57,9 @@ public class PluginMain extends JavaPlugin implements Executor {
         EventExecutor executor = new EventExecutor(this);
 
         getServer().getPluginManager().registerEvents(executor, this);
-        try {
-            getServer().getPluginManager().registerEvents(new ExtendEventExecutor(), this);
-        } catch (Exception ignore) {
-        }
+        getServer().getPluginManager().registerEvents(new ExtendEventExecutor(), this);
 
         getPluginManager().registerEvents(new EventLocker(), this);
-
-        getServer().getMessenger().registerOutgoingPluginChannel(this, Constants.PLUGIN_CHANNEL);
-        getServer().getMessenger().registerIncomingPluginChannel(this, Constants.PLUGIN_CHANNEL, executor);
 
         /*getCommand("playersql").setExecutor(new Commands());*/
 
@@ -77,10 +71,6 @@ public class PluginMain extends JavaPlugin implements Executor {
         for (Player p : getServer().getOnlinePlayers()) {
             UserManager.INSTANCE.saveUser(p, false);
         }
-    }
-
-    public Player getPlayer(UUID uuid) {
-        return getServer().getPlayer(uuid);
     }
 
     public void log(Exception e) {

@@ -1,7 +1,9 @@
 package com.mengcraft.playersql.storage;
 
+import com.mengcraft.playersql.DataSerializer;
 import com.mengcraft.playersql.PlayerData;
 import com.mengcraft.playersql.PluginMain;
+import com.mengcraft.playersql.Utils;
 import com.mengcraft.playersql.storage.table.AccountTable;
 import net.sakuragame.serversystems.manage.api.database.DataManager;
 import net.sakuragame.serversystems.manage.api.database.DatabaseQuery;
@@ -13,17 +15,15 @@ import org.bukkit.inventory.ItemStack;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class StorageManager {
 
-    private PluginMain plugin;
-    private DataManager dataManager;
+    private final DataManager dataManager;
 
-    public static final ItemStack AIR = new ItemStack(Material.AIR);
-
-    public StorageManager(PluginMain plugin) {
-        this.plugin = plugin;
+    public StorageManager() {
         this.dataManager = ClientManagerAPI.getDataManager();
     }
 
@@ -33,59 +33,83 @@ public class StorageManager {
         }
     }
 
-    public PlayerData find(UUID uuid) {
-        int uid = ClientManagerAPI.getUserID(uuid);
+    public PlayerData find(Player player) {
+        int uid = ClientManagerAPI.getUserID(player.getUniqueId());
         if (uid == -1) return null;
 
+        PlayerData account = new PlayerData(uid);
+
         try (DatabaseQuery query = dataManager.createQuery(
-                AccountTable.PLAYER_SQL_DATE.getTableName(),
+                AccountTable.PLAYER_SQL_DATA.getTableName(),
                 "uid", uid
         )) {
             ResultSet result = query.getResultSet();
             if (result.next()) {
                 int hand = result.getInt("hand");
-                String inventory = result.getString("inventory");
-                String armor = result.getString("armor");
                 boolean locked = result.getBoolean("locked");
                 Timestamp timestamp = result.getTimestamp("lastUpdate");
 
-                return new PlayerData(uid, hand, inventory, armor, locked, timestamp);
+                account.setHand(hand);
+                account.setLocked(locked);
+                account.setLastUpdate(timestamp);
+            }
+            else {
+                return null;
             }
         }
         catch (SQLException e ) {
             e.printStackTrace();
         }
 
-        return null;
+        try (DatabaseQuery query = dataManager.createQuery(
+                AccountTable.PLAYER_INVENTORY.getTableName(),
+                "uid", uid
+        )) {
+            Map<Integer, ItemStack> slots = new HashMap<>();
+
+            ResultSet result = query.getResultSet();
+            while (result.next()) {
+                int slot = result.getInt("slot");
+                String id = result.getString("item_id");
+                if (id == null || id.equals("")) continue;
+
+                int amount = result.getInt("item_amount");
+                String data = result.getString("item_data");
+                String unique = result.getString("item_unique");
+
+                slots.put(slot, DataSerializer.deserialize(player, id, amount, data, unique));
+            }
+
+            account.setSlots(slots);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return account;
     }
 
     public void update(PlayerData data) {
         dataManager.executeUpdate(
-                AccountTable.PLAYER_SQL_DATE.getTableName(),
-                new String[] {"hand", "inventory", "armor", "locked"},
-                new Object[] {
-                        data.getHand(),
-                        data.getInventory(),
-                        data.getArmor(),
-                        data.isLocked()
-                },
+                AccountTable.PLAYER_SQL_DATA.getTableName(),
+                new String[] {"hand", "locked"},
+                new Object[] {data.getHand(), data.isLocked()},
                 new String[] {"uid"},
                 new Object[] {data.getUid()}
+        );
+
+        dataManager.executeReplace(
+                AccountTable.PLAYER_INVENTORY.getTableName(),
+                new String[] {"uid", "slot", "item_id", "item_amount", "item_data", "item_unique"},
+                data.getSlotConvertData()
         );
     }
 
     public void save(PlayerData data) {
         dataManager.executeReplace(
-                AccountTable.PLAYER_SQL_DATE.getTableName(),
-                new String[] {"uid", "hand", "inventory", "armor", "locked", "lastUpdate"},
-                new Object[] {
-                        data.getUid(),
-                        data.getHand(),
-                        data.getInventory(),
-                        data.getArmor(),
-                        data.isLocked(),
-                        new Timestamp(System.currentTimeMillis())
-                }
+                AccountTable.PLAYER_SQL_DATA.getTableName(),
+                new String[] {"uid", "hand", "locked", "lastUpdate"},
+                new Object[] {data.getUid(), data.getHand(), data.isLocked(), new Timestamp(System.currentTimeMillis())}
         );
     }
 
@@ -94,7 +118,7 @@ public class StorageManager {
         if (uid == -1) return 0;
 
         return dataManager.executeUpdate(
-                AccountTable.PLAYER_SQL_DATE.getTableName(),
+                AccountTable.PLAYER_SQL_DATA.getTableName(),
                 "locked", lock,
                 "uid", uid
         );

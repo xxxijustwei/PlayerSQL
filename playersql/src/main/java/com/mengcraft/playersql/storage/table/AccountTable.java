@@ -2,15 +2,25 @@ package com.mengcraft.playersql.storage.table;
 
 public enum AccountTable {
 
-    PLAYER_SQL_DATE(new DatabaseTable("playersql_date",
+    PLAYER_SQL_DATA(new DatabaseTable("playersql_data",
             new String[] {
                     "`uid` int NOT NULL PRIMARY KEY",
                     "`hand` int NOT NULL default 0",
-                    "`inventory` longtext",
-                    "`armor` text",
                     "`locked` boolean NOT NULL",
                     "`lastUpdate` timestamp default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"
-            }));
+            })),
+
+    PLAYER_INVENTORY(new DatabaseTable("playersql_inventory",
+            new String[] {
+                    "`uid` int not null",
+                    "`slot` int not null",
+                    "`item_id` varchar(64)",
+                    "`item_amount` int default 0",
+                    "`item_data` varchar(512)",
+                    "`item_unique` varchar(128)",
+                    "UNIQUE KEY `inventory` (`uid`,`slot`)",
+            }
+    ));
 
     private final DatabaseTable table;
 
