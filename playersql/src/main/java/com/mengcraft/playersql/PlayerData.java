@@ -100,6 +100,11 @@ public class PlayerData {
             }
 
             ItemStream itemStream = ZaphkielAPI.INSTANCE.read(item);
+            if (itemStream.isVanilla()) {
+                result.add(new Object[] {this.uid, index, null, 0, null, null});
+                continue;
+            }
+
             String id = itemStream.getZaphkielName();
             int amount = item.getAmount();
             String data = itemStream.getZaphkielData().toJson();
