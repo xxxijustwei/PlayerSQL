@@ -177,15 +177,8 @@ public enum UserManager {
     }
 
     private void syncUserdata(Player who, PlayerData data) {
-        Map<Integer, ItemStack> items = data.getSlots();
-        ItemStack air = new ItemStack(Material.AIR);
-        for (int i = 5; i < 46; i++) {
-            if (!items.containsKey(i)) {
-                who.getInventory().setItem(i, air);
-                continue;
-            }
-            who.getInventory().setItem(i, items.get(i));
-        }
+        who.getInventory().clear();
+        data.getSlots().forEach((index, item) -> who.getInventory().setItem(index, item));
         who.getInventory().setHeldItemSlot(data.getHand());
         who.updateInventory();// Force update needed
 
