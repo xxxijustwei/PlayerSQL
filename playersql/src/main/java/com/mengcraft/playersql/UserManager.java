@@ -8,7 +8,9 @@ import com.mengcraft.playersql.task.DailySaveTask;
 import lombok.val;
 import net.sakuragame.serversystems.manage.client.api.ClientManagerAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -175,7 +177,15 @@ public enum UserManager {
     }
 
     private void syncUserdata(Player who, PlayerData data) {
-        data.getSlots().forEach((index, item) -> who.getInventory().setItem(index, item));
+        Map<Integer, ItemStack> items = data.getSlots();
+        ItemStack air = new ItemStack(Material.AIR);
+        for (int i = 5; i < 46; i++) {
+            if (!items.containsKey(i)) {
+                who.getInventory().setItem(i, air);
+                continue;
+            }
+            who.getInventory().setItem(i, items.get(i));
+        }
         who.getInventory().setHeldItemSlot(data.getHand());
         who.updateInventory();// Force update needed
 
