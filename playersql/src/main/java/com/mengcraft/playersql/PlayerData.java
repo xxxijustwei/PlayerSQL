@@ -63,7 +63,7 @@ public class PlayerData {
     }
 
     public void setSlots(Player player) {
-        for (int i = 5; i < 46; i++) {
+        for (int i = 0; i < 41; i++) {
             ItemStack item = player.getInventory().getItem(i);
             if (item == null || item.getItemMeta() == null) {
                 this.slots.put(i, null);
