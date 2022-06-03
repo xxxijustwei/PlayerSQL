@@ -19,10 +19,15 @@ public class DataSerializer {
         if (data != null && !data.isEmpty()) object.add("data", parser.parse(data));
         if (unique != null && !unique.isEmpty()) object.add("unique", parser.parse(unique));
 
-        ItemStream itemStream = ZaphkielAPI.INSTANCE.deserialize(object);
-        ItemStack result = itemStream.rebuildToItemStack(player);
-        result.setAmount(amount);
+        try {
+            ItemStream itemStream = ZaphkielAPI.INSTANCE.deserialize(object);
+            ItemStack result = itemStream.rebuildToItemStack(player);
+            result.setAmount(amount);
 
-        return result;
+            return result;
+        }
+        catch (IllegalStateException ignored) {}
+
+        return null;
     }
 }

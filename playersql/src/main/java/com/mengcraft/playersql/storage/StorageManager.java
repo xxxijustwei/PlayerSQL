@@ -77,7 +77,9 @@ public class StorageManager {
                 String data = result.getString("item_data");
                 String unique = result.getString("item_unique");
 
-                slots.put(slot, DataSerializer.deserialize(player, id, amount, data, unique));
+                ItemStack item = DataSerializer.deserialize(player, id, amount, data, unique);
+                if (item == null) continue;
+                slots.put(slot, item);
             }
 
             account.setSlots(slots);
