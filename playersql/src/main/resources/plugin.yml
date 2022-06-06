@@ -3,6 +3,6 @@ name: PlayerSQL
 version: ${project.version}
 author: caoli5288@gmail.com
 depend:
-  - datamanager-bukkit-parent
+  - DataManager
   - ProtocolLib
   - Zaphkiel
