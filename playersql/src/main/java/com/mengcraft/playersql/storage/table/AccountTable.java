@@ -16,7 +16,7 @@ public enum AccountTable {
                     "`slot` int not null",
                     "`item_id` varchar(64)",
                     "`item_amount` int default 0",
-                    "`item_data` varchar(512)",
+                    "`item_data` varchar(1024)",
                     "`item_unique` varchar(128)",
                     "UNIQUE KEY `inventory` (`uid`,`slot`)",
             }
